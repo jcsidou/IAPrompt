@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, User
 from django.conf import settings
 
 class User(AbstractUser):
@@ -44,8 +44,8 @@ class Prompt(models.Model):
         return round(avg_rating or 0, 1)  # Arredondando para 1 decimal
 
     def user_rating(self, user):
-        avaliacao = self.avaliacao_set.filter(user=user).first()
-        return avaliacao.nota if avaliacao else 0
+        rating = self.avaliacao_set.filter(user=user).first()
+        return rating.nota if rating else None
 
 class Avaliacao(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -54,3 +54,6 @@ class Avaliacao(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.prompt.descricao} - {self.nota}"
+    
+    class Meta:
+        unique_together = ('user', 'prompt')

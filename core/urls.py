@@ -23,4 +23,5 @@ urlpatterns = [
     path('categoria/<int:pk>/edit/', views.CategoriaUpdateView.as_view(), name='categoria-edit'),
     path('categoria/<int:pk>/delete/', views.CategoriaDeleteView.as_view(), name='categoria-delete'),
     path('accounts/', include('django.contrib.auth.urls')),  # Adiciona URLs de autenticação
+    path('prompt/<int:pk>/rate/', views.RatePromptView.as_view(), name='rate-prompt'),  # Adiciona esta linha
 ]

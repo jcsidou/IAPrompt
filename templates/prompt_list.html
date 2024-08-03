@@ -1,7 +1,7 @@
+{% extends 'base.html' %}
 {% load static %}
 {% load custom_filters %}
 
-{% extends 'base.html' %}
 {% block title %}Prompts{% endblock %}
 {% block content %}
 <h1>Prompts</h1>
@@ -58,11 +58,12 @@
             <td>{{ prompt.creator.username }}</td>
             <td>
                 {% with average=prompt.average_rating %}
-                    {% for i in range(1, 6) %}
+                    {% comment %} Média: {{ average|floatformat:1 }}<br> {% endcomment %}
+                    {% for i in 1|range_filter:6 %}
                         {% if i <= average %}
-                            ★
+                        <span class="star filled">★</span>
                         {% else %}
-                            ☆
+                        <span class="star empty">☆</span>
                         {% endif %}
                     {% endfor %}
                 {% endwith %}
@@ -70,12 +71,12 @@
             <td>
                 <form method="post" action="{% url 'rate-prompt' prompt.pk %}">
                     {% csrf_token %}
-                    {% for i in range(1, 6) %}
-                        <button type="submit" name="nota" value="{{ i }}">
-                            {% if user.is_authenticated and i <= prompt.user_rating %}
-                                ★
+                    {% for i in 1|range_filter:6 %}
+                        <button type="submit" name="nota" value="{{ i }}" class="star-button">
+                            {% if user.is_authenticated and i <= user_rate %}
+                            <span class="star filled">★</span>
                             {% else %}
-                                ☆
+                            <span class="star empty">☆</span>
                             {% endif %}
                         </button>
                     {% endfor %}

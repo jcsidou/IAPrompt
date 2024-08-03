@@ -6,7 +6,7 @@ class PromptForm(forms.ModelForm):
         model = Prompt
         fields = ['descricao', 'modelo', 'role', 'categorias', 'prompt', 'json']
         widgets = {
-            'categorias': forms.CheckboxSelectMultiple,
+            'categorias': forms.SelectMultiple(attrs={'class': 'custom-multiselect'}),
         }
 
 class ModelForm(forms.ModelForm):

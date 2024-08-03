@@ -3,7 +3,6 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, View
 from .models import Prompt, Model, Role, Avaliacao, Categoria
 from .forms import PromptForm, ModelForm, RoleForm, CategoriaForm
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.db.models import Avg
 from django.http import JsonResponse
@@ -30,8 +29,17 @@ class PromptListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['models'] = Model.objects.all()
         context['categorias'] = Categoria.objects.all()
+        user_ratings = {}
+        for prompt in context['object_list']:
+            user_rating = prompt.user_rating(self.request.user)
+            user_ratings[prompt.pk] = user_rating
+            print(f'Prompt ID: {prompt.pk}, User Rating: {user_rating}')  # Adicionar depuração para cada prompt
+        context['user_ratings'] = user_ratings
+        context['user_rate'] = user_ratings[1]
+        context['debug'] = {
+            'user_ratings': user_ratings
+        }
         return context
-
 class PromptDetailView(DetailView):
     model = Prompt
     template_name = 'prompt_detail.html'
@@ -136,7 +144,8 @@ class RatePromptView(LoginRequiredMixin, View):
     def post(self, request, pk):
         prompt = get_object_or_404(Prompt, pk=pk)
         nota = int(request.POST.get('nota'))
-        avaliacao, created = Avaliacao.objects.get_or_create(user=request.user, prompt=prompt)
+        avaliacao, created = Avaliacao.objects.get_or_create(user=request.user, prompt=prompt, defaults={'nota': nota})
+        # if not created:
         avaliacao.nota = nota
         avaliacao.save()
         return redirect('prompt-list')
