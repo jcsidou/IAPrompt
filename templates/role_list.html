@@ -1,25 +1,29 @@
 {% extends 'base.html' %}
+{% load static %}
+
 {% block title %}Roles{% endblock %}
 {% block content %}
 <h1>Roles</h1>
-<table>
-    <thead>
+<div class="filter-container">
+    <a href="{% url 'role-create' %}" class="btn btn-primary">Nova Role</a>
+</div>
+<table class="centered-table">
+    <thead class="table-header">
         <tr>
-            <th>Descrição</th>
-            <th>Ações</th>
+            <th class="sortable column-descricao" onclick="sortTable(0)">Descrição</th>
+            <th class="column-acoes">Ações</th>
         </tr>
     </thead>
     <tbody>
         {% for role in object_list %}
         <tr>
-            <td><a href="{% url 'role-detail' role.pk %}">{{ role.descricao }}</a></td>
-            <td>
-                <a href="{% url 'role-edit' role.pk %}">Editar</a>
-                <a href="{% url 'role-delete' role.pk %}">Excluir</a>
+            <td class="column-descricao" onclick="window.location.href='{% url 'role-detail' role.pk %}'">{{ role.descricao }}</td>
+            <td class="column-acoes">
+                <a href="{% url 'role-edit' role.pk %}" class="btn btn-primary">Editar</a>
+                <a href="{% url 'role-delete' role.pk %}" class="btn btn-danger">Excluir</a>
             </td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
-<a href="{% url 'role-create' %}">Nova Role</a>
 {% endblock %}

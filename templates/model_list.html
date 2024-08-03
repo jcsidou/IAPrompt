@@ -1,25 +1,29 @@
 {% extends 'base.html' %}
-{% block title %}Models{% endblock %}
+{% load static %}
+
+{% block title %}Modelos{% endblock %}
 {% block content %}
-<h1>Models</h1>
-<table>
-    <thead>
+<h1>Modelos</h1>
+<div class="filter-container">
+    <a href="{% url 'model-create' %}" class="btn btn-primary">Novo Modelo</a>
+</div>
+<table class="centered-table">
+    <thead class="table-header">
         <tr>
-            <th>Descrição</th>
-            <th>Ações</th>
+            <th class="sortable column-descricao" onclick="sortTable(0)">Descrição</th>
+            <th class="column-acoes">Ações</th>
         </tr>
     </thead>
     <tbody>
         {% for model in object_list %}
         <tr>
-            <td><a href="{% url 'model-detail' model.pk %}">{{ model.descricao }}</a></td>
-            <td>
-                <a href="{% url 'model-edit' model.pk %}">Editar</a>
-                <a href="{% url 'model-delete' model.pk %}">Excluir</a>
+            <td class="column-descricao" onclick="window.location.href='{% url 'model-detail' model.pk %}'">{{ model.descricao }}</td>
+            <td class="column-acoes">
+                <a href="{% url 'model-edit' model.pk %}" class="btn btn-primary">Editar</a>
+                <a href="{% url 'model-delete' model.pk %}" class="btn btn-danger">Excluir</a>
             </td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
-<a href="{% url 'model-create' %}">Novo Model</a>
 {% endblock %}

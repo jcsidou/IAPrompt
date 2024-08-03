@@ -3,42 +3,60 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, View
 from .models import Prompt, Model, Role, Avaliacao, Categoria
 from .forms import PromptForm, ModelForm, RoleForm, CategoriaForm
+from django.db.models.functions import Lower
 from django.urls import reverse_lazy
-from django.db.models import Avg
+from django.db.models import Avg, F
 from django.http import JsonResponse
-
 class PromptListView(LoginRequiredMixin, ListView):
     model = Prompt
     template_name = 'prompt_list.html'
-    login_url = 'login'  # Redirecionar para a página de login se não estiver autenticado
+    login_url = 'login'
     
     def get_queryset(self):
         queryset = super().get_queryset()
         modelo = self.request.GET.get('modelo')
         categoria = self.request.GET.get('categoria')
         avaliacao = self.request.GET.get('avaliacao')
+        sort_by = self.request.GET.get('sort_by')
+        sort_order = self.request.GET.get('sort_order', 'asc')
+
         if modelo:
-            queryset = queryset.filter(modelo=modelo)
+            queryset = queryset.filter(modelo_id=modelo)
         if categoria:
             queryset = queryset.filter(categorias=categoria)
         if avaliacao:
             queryset = queryset.annotate(avg_nota=Avg('avaliacao__nota')).filter(avg_nota__gte=avaliacao)
+
+        if sort_by:
+            if sort_by == 'user_rating':
+                queryset = sorted(queryset, key=lambda x: x.user_rating(self.request.user) or 0, reverse=(sort_order == 'desc'))
+            elif sort_by in ['descricao', 'modelo', 'role', 'creator__username']:
+                if sort_by == 'descricao':
+                    order_by = Lower(F(sort_by)).asc(nulls_last=True) if sort_order == 'asc' else Lower(F(sort_by)).desc(nulls_last=True)
+                else:
+                    order_by = F(sort_by).asc(nulls_last=True) if sort_order == 'asc' else F(sort_by).desc(nulls_last=True)
+                queryset = queryset.order_by(order_by)
+            elif sort_by == 'average_rating':
+                queryset = queryset.annotate(average_rating=Avg('avaliacao__nota'))
+                order_by = F("average_rating").asc(nulls_last=True) if sort_order == 'asc' else F("average_rating").desc(nulls_last=True)
+                queryset = queryset.order_by(order_by)
+
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['models'] = Model.objects.all()
         context['categorias'] = Categoria.objects.all()
-        user_ratings = {}
-        for prompt in context['object_list']:
-            user_rating = prompt.user_rating(self.request.user)
-            user_ratings[prompt.pk] = user_rating
-            print(f'Prompt ID: {prompt.pk}, User Rating: {user_rating}')  # Adicionar depuração para cada prompt
-        context['user_ratings'] = user_ratings
-        context['user_rate'] = user_ratings[1]
-        context['debug'] = {
-            'user_ratings': user_ratings
-        }
+        context['sort_by'] = self.request.GET.get('sort_by', 'descricao')
+        context['sort_order'] = self.request.GET.get('sort_order', 'asc')
+        return context
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['models'] = Model.objects.all()
+        context['categorias'] = Categoria.objects.all()
+        context['sort_by'] = self.request.GET.get('sort_by', 'descricao')
+        context['sort_order'] = self.request.GET.get('sort_order', 'asc')
         return context
 class PromptDetailView(DetailView):
     model = Prompt
@@ -149,3 +167,12 @@ class RatePromptView(LoginRequiredMixin, View):
         avaliacao.nota = nota
         avaliacao.save()
         return redirect('prompt-list')
+    
+class UserRatingView(LoginRequiredMixin, View):
+    def get(self, request, pk):
+        prompt = get_object_or_404(Prompt, pk=pk)
+        user_rating = Avaliacao.objects.filter(user=request.user, prompt=prompt).first()
+        rating = user_rating.nota if user_rating else 0
+        return JsonResponse({'rating': rating})
+
+    

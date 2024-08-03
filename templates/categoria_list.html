@@ -1,25 +1,29 @@
 {% extends 'base.html' %}
+{% load static %}
+
 {% block title %}Categorias{% endblock %}
 {% block content %}
 <h1>Categorias</h1>
-<table>
-    <thead>
+<div class="filter-container">
+    <a href="{% url 'categoria-create' %}" class="btn btn-primary">Nova Categoria</a>
+</div>
+<table class="centered-table">
+    <thead class="table-header">
         <tr>
-            <th>Descrição</th>
-            <th>Ações</th>
+            <th class="sortable column-descricao" onclick="sortTable(0)">Descrição</th>
+            <th class="column-acoes">Ações</th>
         </tr>
     </thead>
     <tbody>
         {% for categoria in object_list %}
         <tr>
-            <td><a href="{% url 'categoria-detail' categoria.pk %}">{{ categoria.descricao }}</a></td>
-            <td>
-                <a href="{% url 'categoria-edit' categoria.pk %}">Editar</a>
-                <a href="{% url 'categoria-delete' categoria.pk %}">Excluir</a>
+            <td class="column-descricao" onclick="window.location.href='{% url 'categoria-detail' categoria.pk %}'">{{ categoria.descricao }}</td>
+            <td class="column-acoes">
+                <a href="{% url 'categoria-edit' categoria.pk %}" class="btn btn-primary">Editar</a>
+                <a href="{% url 'categoria-delete' categoria.pk %}" class="btn btn-danger">Excluir</a>
             </td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
-<a href="{% url 'categoria-create' %}">Nova Categoria</a>
 {% endblock %}

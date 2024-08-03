@@ -5,91 +5,127 @@
 {% block title %}Prompts{% endblock %}
 {% block content %}
 <h1>Prompts</h1>
-<form method="get">
-    <label for="modelo">Modelo:</label>
-    <select name="modelo" id="modelo">
-        <option value="">Todos</option>
-        {% for model in models %}
-        <option value="{{ model.pk }}">{{ model.descricao }}</option>
-        {% endfor %}
-    </select>
-    <label for="categoria">Categoria:</label>
-    <select name="categoria" id="categoria">
-        <option value="">Todas</option>
-        {% for categoria in categorias %}
-        <option value="{{ categoria.pk }}">{{ categoria.descricao }}</option>
-        {% endfor %}
-    </select>
-    <label for="avaliacao">Avaliação:</label>
-    <select name="avaliacao" id="avaliacao">
-        <option value="">Todas</option>
-        <option value="1">1 estrela</option>
-        <option value="2">2 estrelas</option>
-        <option value="3">3 estrelas</option>
-        <option value="4">4 estrelas</option>
-        <option value="5">5 estrelas</option>
-    </select>
-    <button type="submit">Filtrar</button>
-</form>
-<table>
-    <thead>
+<div class="filter-container">
+    <a href="{% url 'prompt-create' %}" class="btn btn-primary">Novo Prompt</a>
+    <form method="get" class="filter-form">
+        <label for="modelo">Modelo:</label>
+        <select name="modelo" id="modelo">
+            <option value="">Todos</option>
+            {% for model in models %}
+            <option value="{{ model.pk }}">{{ model.descricao }}</option>
+            {% endfor %}
+        </select>
+        <label for="categoria">Categoria:</label>
+        <select name="categoria" id="categoria">
+            <option value="">Todas</option>
+            {% for categoria in categorias %}
+            <option value="{{ categoria.pk }}">{{ categoria.descricao }}</option>
+            {% endfor %}
+        </select>
+        <label for="avaliacao">Avaliação:</label>
+        <select name="avaliacao" id="avaliacao">
+            <option value="">Todas</option>
+            <option value="1">1 estrela</option>
+            <option value="2">2 estrelas</option>
+            <option value="3">3 estrelas</option>
+            <option value="4">4 estrelas</option>
+            <option value="5">5 estrelas</option>
+        </select>
+        <button type="submit" class="btn btn-primary">Filtrar</button>
+    </form>
+</div>
+<table class="full-width-table">
+    <thead class="table-header">
         <tr>
-            <th>Descrição</th>
-            <th>Modelo</th>
-            <th>Role</th>
-            <th>Categorias</th>
-            <th>Criador</th>
-            <th>Média Avaliação</th>
-            <th>Avaliação do Usuário</th>
-            <th>Ações</th>
+            <th class="sortable column-descricao{% if sort_by == 'descricao' %} active{% if sort_order == 'desc' %} desc{% else %} asc{% endif %}{% endif %}" data-sort="descricao">Descrição</th>
+            <th class="sortable column-modelo{% if sort_by == 'modelo' %} active{% if sort_order == 'desc' %} desc{% else %} asc{% endif %}{% endif %}" data-sort="modelo">Modelo</th>
+            <th class="sortable column-role{% if sort_by == 'role' %} active{% if sort_order == 'desc' %} desc{% else %} asc{% endif %}{% endif %}" data-sort="role">Role</th>
+            <th class="column-categorias">Categorias</th>
+            <th class="sortable column-creator{% if sort_by == 'creator__username' %} active{% if sort_order == 'desc' %} desc{% else %} asc{% endif %}{% endif %}" data-sort="creator__username">Criador</th>
+            <th class="sortable rating-column{% if sort_by == 'average_rating' %} active{% if sort_order == 'desc' %} desc{% else %} asc{% endif %}{% endif %}" data-sort="average_rating">Média Avaliação</th>
+            <th class="sortable rating-column{% if sort_by == 'user_rating' %} active{% if sort_order == 'desc' %} desc{% else %} asc{% endif %}{% endif %}" data-sort="user_rating">Minha Avaliação</th>
+            <th class="column-acoes">Ações</th>
         </tr>
     </thead>
     <tbody>
         {% for prompt in object_list %}
-        <tr>
-            <td>{{ prompt.descricao }}</td>
-            <td>{{ prompt.modelo }}</td>
-            <td>{{ prompt.role }}</td>
-            <td>
+        <tr data-prompt-id="{{ prompt.pk }}">
+            <td class="column-descricao" onclick="window.location.href='{% url 'prompt-detail' prompt.pk %}'">{{ prompt.descricao }}</td>
+            <td class="column-modelo">{{ prompt.modelo }}</td>
+            <td class="column-role">{{ prompt.role }}</td>
+            <td class="column-categorias">
                 {% for categoria in prompt.categorias.all %}
                     {{ categoria.descricao }}{% if not forloop.last %}, {% endif %}
                 {% endfor %}
             </td>
-            <td>{{ prompt.creator.username }}</td>
-            <td>
+            <td class="column-creator">{{ prompt.creator.username }}</td>
+            <td class="rating-column">
                 {% with average=prompt.average_rating %}
-                    {% comment %} Média: {{ average|floatformat:1 }}<br> {% endcomment %}
                     {% for i in 1|range_filter:6 %}
                         {% if i <= average %}
-                        <span class="star filled">★</span>
+                            <span class="star filled">★</span>
                         {% else %}
-                        <span class="star empty">☆</span>
+                            <span class="star empty">☆</span>
                         {% endif %}
                     {% endfor %}
                 {% endwith %}
             </td>
-            <td>
+            <td class="rating-column user-rating" data-prompt-id="{{ prompt.pk }}">
                 <form method="post" action="{% url 'rate-prompt' prompt.pk %}">
                     {% csrf_token %}
                     {% for i in 1|range_filter:6 %}
                         <button type="submit" name="nota" value="{{ i }}" class="star-button">
-                            {% if user.is_authenticated and i <= user_rate %}
-                            <span class="star filled">★</span>
-                            {% else %}
-                            <span class="star empty">☆</span>
-                            {% endif %}
+                            <span class="star">☆</span>
                         </button>
                     {% endfor %}
                 </form>
             </td>
-            <td>
-                <a href="{% url 'prompt-detail' prompt.pk %}">Detalhes</a>
-                <a href="{% url 'prompt-edit' prompt.pk %}">Editar</a>
-                <a href="{% url 'prompt-delete' prompt.pk %}">Excluir</a>
+            <td class="column-acoes">
+                <a href="{% url 'prompt-edit' prompt.pk %}" class="btn btn-primary">Editar</a>
+                <a href="{% url 'prompt-delete' prompt.pk %}" class="btn btn-danger">Excluir</a>
             </td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
-<a href="{% url 'prompt-create' %}">Novo Prompt</a>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll(".user-rating").forEach(function(element) {
+        const promptId = element.getAttribute("data-prompt-id");
+        fetch(`/get-user-rating/${promptId}/`)
+            .then(response => response.json())
+            .then(data => {
+                const rating = data.rating;
+                const stars = element.querySelectorAll(".star");
+                stars.forEach((star, index) => {
+                    if (index < rating) {
+                        star.classList.add("filled");
+                        star.classList.remove("empty");
+                        star.textContent = "★";
+                    } else {
+                        star.classList.add("empty");
+                        star.classList.remove("filled");
+                        star.textContent = "☆";
+                    }
+                });
+            });
+    });
+
+    const getSort = ({ target }) => {
+        const sortBy = target.dataset.sort;
+        const currentSortBy = "{{ sort_by }}";
+        let newSortOrder = "asc";
+        if (currentSortBy === sortBy) {
+            const currentSortOrder = "{{ sort_order }}";
+            newSortOrder = currentSortOrder === "asc" ? "desc" : "asc";
+        }
+        const url = new URL(window.location.href);
+        url.searchParams.set('sort_by', sortBy);
+        url.searchParams.set('sort_order', newSortOrder);
+        window.location.href = url.toString();
+    };
+
+    document.querySelectorAll('.sortable').forEach(header => header.addEventListener('click', getSort));
+});
+</script>
 {% endblock %}

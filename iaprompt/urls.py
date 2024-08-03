@@ -1,8 +1,53 @@
 from django.contrib import admin
 from django.urls import path, include
+from core.views import (
+    PromptListView,
+    PromptDetailView,
+    PromptCreateView,
+    PromptUpdateView,
+    PromptDeleteView,
+    ModelListView,
+    ModelDetailView,
+    ModelCreateView,
+    ModelUpdateView,
+    ModelDeleteView,
+    RoleListView,
+    RoleDetailView,
+    RoleCreateView,
+    RoleUpdateView,
+    RoleDeleteView,
+    CategoriaListView,
+    CategoriaDetailView,
+    CategoriaCreateView,
+    CategoriaUpdateView,
+    CategoriaDeleteView,
+    RatePromptView,
+    UserRatingView
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('core.urls')),
-    path('accounts/', include('django.contrib.auth.urls')),  # Adicionar esta linha
+    path('', PromptListView.as_view(), name='prompt-list'),
+    path('prompt/<int:pk>/', PromptDetailView.as_view(), name='prompt-detail'),
+    path('prompt/create/', PromptCreateView.as_view(), name='prompt-create'),
+    path('prompt/<int:pk>/edit/', PromptUpdateView.as_view(), name='prompt-edit'),
+    path('prompt/<int:pk>/delete/', PromptDeleteView.as_view(), name='prompt-delete'),
+    path('model/', ModelListView.as_view(), name='model-list'),
+    path('model/<int:pk>/', ModelDetailView.as_view(), name='model-detail'),
+    path('model/create/', ModelCreateView.as_view(), name='model-create'),
+    path('model/<int:pk>/edit/', ModelUpdateView.as_view(), name='model-edit'),
+    path('model/<int:pk>/delete/', ModelDeleteView.as_view(), name='model-delete'),
+    path('role/', RoleListView.as_view(), name='role-list'),
+    path('role/<int:pk>/', RoleDetailView.as_view(), name='role-detail'),
+    path('role/create/', RoleCreateView.as_view(), name='role-create'),
+    path('role/<int:pk>/edit/', RoleUpdateView.as_view(), name='role-edit'),
+    path('role/<int:pk>/delete/', RoleDeleteView.as_view(), name='role-delete'),
+    path('categoria/', CategoriaListView.as_view(), name='categoria-list'),
+    path('categoria/<int:pk>/', CategoriaDetailView.as_view(), name='categoria-detail'),
+    path('categoria/create/', CategoriaCreateView.as_view(), name='categoria-create'),
+    path('categoria/<int:pk>/edit/', CategoriaUpdateView.as_view(), name='categoria-edit'),
+    path('categoria/<int:pk>/delete/', CategoriaDeleteView.as_view(), name='categoria-delete'),
+    path('rate-prompt/<int:pk>/', RatePromptView.as_view(), name='rate-prompt'),
+    path('get-user-rating/<int:pk>/', UserRatingView.as_view(), name='get-user-rating'),
+    path('accounts/', include('django.contrib.auth.urls')),  # Adicionando URLs de autenticação padrão
 ]
