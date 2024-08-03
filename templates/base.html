@@ -9,27 +9,25 @@
     <script src="{% static 'js/scripts.js' %}" defer></script>
 </head>
 <body>
+    {% if user.is_authenticated %}
     <header>
         <nav>
             <ul class="nav-buttons">
-                <li><a href="{% url 'prompt-list' %}" class="btn btn-primary">Prompts</a></li>
-                <li><a href="{% url 'model-list' %}" class="btn btn-primary">Modelos</a></li>
-                <li><a href="{% url 'categoria-list' %}" class="btn btn-primary">Categorias</a></li>
-                <li><a href="{% url 'role-list' %}" class="btn btn-primary">Roles</a></li>
-                {% if user.is_authenticated %}
-                    <li class="user-info">{{ user.username }}</li>
-                    <li class="logout-button">
-                        <form method="post" action="{% url 'logout' %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-danger">Logout</button>
-                        </form>
-                    </li>
-                {% else %}
-                    <li><a href="{% url 'login' %}" class="btn btn-primary">Login</a></li>
-                {% endif %}
+                <li><a href="{% url 'prompt-list' %}" class="top-buttons btn btn-primary">Prompts</a></li>
+                <li><a href="{% url 'model-list' %}" class="top-buttons btn btn-primary">Modelos</a></li>
+                <li><a href="{% url 'categoria-list' %}" class="top-buttons btn btn-primary">Categorias</a></li>
+                <li><a href="{% url 'role-list' %}" class="top-buttons btn btn-primary">Roles</a></li>
+                <li class="logout-button">
+                    <form method="post" action="{% url 'logout' %}">
+                        <a class="user-info"> {{ user.username }} </a>
+                        {% csrf_token %}
+                        <button type="submit" class="top-buttons action-button btn-danger btn">Logout</button>
+                    </form>
+                </li>
             </ul>
         </nav>
     </header>
+    {% endif %}
     <main>
         {% block content %}
         {% endblock %}
