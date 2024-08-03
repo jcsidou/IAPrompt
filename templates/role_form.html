@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Nova Role{% endblock %}
+{% block content %}
+<h1>Nova Role</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_table }}
+    <button type="submit">Salvar</button>
+</form>
+{% endblock %}

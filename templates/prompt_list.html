@@ -1,0 +1,94 @@
+{% load static %}
+{% load custom_filters %}
+
+{% extends 'base.html' %}
+{% block title %}Prompts{% endblock %}
+{% block content %}
+<h1>Prompts</h1>
+<form method="get">
+    <label for="modelo">Modelo:</label>
+    <select name="modelo" id="modelo">
+        <option value="">Todos</option>
+        {% for model in models %}
+        <option value="{{ model.pk }}">{{ model.descricao }}</option>
+        {% endfor %}
+    </select>
+    <label for="categoria">Categoria:</label>
+    <select name="categoria" id="categoria">
+        <option value="">Todas</option>
+        {% for categoria in categorias %}
+        <option value="{{ categoria.pk }}">{{ categoria.descricao }}</option>
+        {% endfor %}
+    </select>
+    <label for="avaliacao">Avaliação:</label>
+    <select name="avaliacao" id="avaliacao">
+        <option value="">Todas</option>
+        <option value="1">1 estrela</option>
+        <option value="2">2 estrelas</option>
+        <option value="3">3 estrelas</option>
+        <option value="4">4 estrelas</option>
+        <option value="5">5 estrelas</option>
+    </select>
+    <button type="submit">Filtrar</button>
+</form>
+<table>
+    <thead>
+        <tr>
+            <th>Descrição</th>
+            <th>Modelo</th>
+            <th>Role</th>
+            <th>Categorias</th>
+            <th>Criador</th>
+            <th>Média Avaliação</th>
+            <th>Avaliação do Usuário</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for prompt in object_list %}
+        <tr>
+            <td>{{ prompt.descricao }}</td>
+            <td>{{ prompt.modelo }}</td>
+            <td>{{ prompt.role }}</td>
+            <td>
+                {% for categoria in prompt.categorias.all %}
+                    {{ categoria.descricao }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </td>
+            <td>{{ prompt.creator.username }}</td>
+            <td>
+                {% with average=prompt.average_rating %}
+                    {% for i in range(1, 6) %}
+                        {% if i <= average %}
+                            ★
+                        {% else %}
+                            ☆
+                        {% endif %}
+                    {% endfor %}
+                {% endwith %}
+            </td>
+            <td>
+                <form method="post" action="{% url 'rate-prompt' prompt.pk %}">
+                    {% csrf_token %}
+                    {% for i in range(1, 6) %}
+                        <button type="submit" name="nota" value="{{ i }}">
+                            {% if user.is_authenticated and i <= prompt.user_rating %}
+                                ★
+                            {% else %}
+                                ☆
+                            {% endif %}
+                        </button>
+                    {% endfor %}
+                </form>
+            </td>
+            <td>
+                <a href="{% url 'prompt-detail' prompt.pk %}">Detalhes</a>
+                <a href="{% url 'prompt-edit' prompt.pk %}">Editar</a>
+                <a href="{% url 'prompt-delete' prompt.pk %}">Excluir</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{% url 'prompt-create' %}">Novo Prompt</a>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Novo Prompt{% endblock %}
+{% block content %}
+<h1>Novo Prompt</h1>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <table>
+        <tr>
+            <th>{{ form.descricao.label_tag }}</th>
+            <td>{{ form.descricao }}</td>
+        </tr>
+        <tr>
+            <th>{{ form.modelo.label_tag }}</th>
+            <td>{{ form.modelo }}</td>
+        </tr>
+        <tr>
+            <th>{{ form.role.label_tag }}</th>
+            <td>{{ form.role }}</td>
+        </tr>
+        <tr>
+            <th>{{ form.categorias.label_tag }}</th>
+            <td>{{ form.categorias }}</td>
+        </tr>
+        <tr>
+            <th>{{ form.prompt.label_tag }}</th>
+            <td>{{ form.prompt }}</td>
+        </tr>
+        <tr>
+            <th>{{ form.json.label_tag }}</th>
+            <td>{{ form.json }}</td>
+        </tr>
+    </table>
+    <button type="submit">Salvar</button>
+</form>
+{% endblock %}

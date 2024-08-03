@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Roles{% endblock %}
+{% block content %}
+<h1>Roles</h1>
+<table>
+    <thead>
+        <tr>
+            <th>Descrição</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for role in object_list %}
+        <tr>
+            <td><a href="{% url 'role-detail' role.pk %}">{{ role.descricao }}</a></td>
+            <td>
+                <a href="{% url 'role-edit' role.pk %}">Editar</a>
+                <a href="{% url 'role-delete' role.pk %}">Excluir</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{% url 'role-create' %}">Nova Role</a>
+{% endblock %}

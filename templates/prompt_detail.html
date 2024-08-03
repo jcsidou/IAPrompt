@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Detalhes do Prompt{% endblock %}
+{% block content %}
+<h1>{{ object.descricao }}</h1>
+<p><strong>Modelo:</strong> {{ object.modelo }}</p>
+<p><strong>Role:</strong> {{ object.role }}</p>
+<p><strong>Criador:</strong> {{ object.creator.username }}</p>
+<p><strong>Prompt:</strong> {{ object.prompt }}</p>
+<p><strong>JSON:</strong> {{ object.json.url }}</p>
+<a href="{% url 'prompt-edit' object.pk %}">Editar</a>
+<a href="{% url 'prompt-delete' object.pk %}">Excluir</a>
+{% endblock %}

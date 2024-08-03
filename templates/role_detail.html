@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block title %}Detalhes da Role{% endblock %}
+{% block content %}
+<h1>{{ object.descricao }}</h1>
+<p><strong>ID da Role:</strong> {{ object.role_id }}</p>
+<a href="{% url 'role-edit' object.pk %}">Editar</a>
+<a href="{% url 'role-delete' object.pk %}">Excluir</a>
+{% endblock %}

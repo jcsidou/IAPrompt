@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block title %}Detalhes do Modelo{% endblock %}
+{% block content %}
+<h1>{{ object.descricao }}</h1>
+<p><strong>ID do Modelo:</strong> {{ object.model_id }}</p>
+<a href="{% url 'model-edit' object.pk %}">Editar</a>
+<a href="{% url 'model-delete' object.pk %}">Excluir</a>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Models{% endblock %}
+{% block content %}
+<h1>Models</h1>
+<table>
+    <thead>
+        <tr>
+            <th>Descrição</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for model in object_list %}
+        <tr>
+            <td><a href="{% url 'model-detail' model.pk %}">{{ model.descricao }}</a></td>
+            <td>
+                <a href="{% url 'model-edit' model.pk %}">Editar</a>
+                <a href="{% url 'model-delete' model.pk %}">Excluir</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{% url 'model-create' %}">Novo Model</a>
+{% endblock %}

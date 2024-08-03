@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}IAPrompt{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="{% url 'prompt-list' %}">Prompts</a></li>
+                <li><a href="{% url 'model-list' %}">Models</a></li>
+                <li><a href="{% url 'categoria-list' %}">Categorias</a></li>
+                <li><a href="{% url 'role-list' %}">Roles</a></li>
+                {% if user.is_authenticated %}
+                    <li>
+                        <form method="post" action="{% url 'logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" style="background:none;border:none;color:inherit;cursor:pointer;">Logout</button>
+                        </form>
+                    </li>
+                    <li>{{ user.username }}</li>
+                {% else %}
+                    <li><a href="{% url 'login' %}">Login</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+</body>
+</html>
